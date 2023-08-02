@@ -142,10 +142,27 @@ var는 함수 스코프이기 때문에 var를 사용하지 않고 let을 사용
     //얕은 복사
     const m2 = arr[0];
     
-    //얕은 복사( ... )
+    //얕은 복사 스프레드 연산자( ... )
     const m3 = { ...arr[0] };   //객체 얕은 복사
     const arr2 = [...arr];      //배열 얕은 복사
 ```
+
+### 스프레드 연산자 응용
+
+```javascript
+const cookie = {
+  base: "cookie",
+  madeIn: "korea"
+}
+
+//객체를 펼쳐준다
+const chocoCookie = {
+  ...cookie,
+  toping: "choco"
+}
+```
+
+
 
 ## this
 
@@ -173,7 +190,7 @@ var는 함수 스코프이기 때문에 var를 사용하지 않고 let을 사용
 
 ## 화살표 함수와 this
 
-```Javascript
+```javascript
     class game {
         constructor(name, hp) {
             this.name = name;
@@ -211,3 +228,160 @@ var는 함수 스코프이기 때문에 var를 사용하지 않고 let을 사용
         }
     }
 ```
+
+## 배열 내장함수
+
+~~~javascript
+const arr = [1, 2, 3, 4];
+let newArr = [];
+
+//forEach
+arr.forEach((elm) => {
+  console.log(elm);
+});
+
+//map
+newArr = arr.map((elm) => {
+  return elm * 2;
+});
+
+let number = 3;
+//includes
+//배열 안에 인자 값이 있으면 true 없으면 false
+console.log(arr.includes(number));
+
+//indexOf
+console.log(arr.indexOf(number));
+
+//findIndex
+//배열 안 내용의 인덱스를 함수를 통해 찾기
+const arr2 = [
+  { num:1, color: "red" },
+  { num:2, color: "blue" },
+  { num:3, color: "black" },
+  { num:4, color: "green" },
+]
+console.log(arr2.findIndex((elm) => {
+  return elm.color === "red";
+}));
+
+//find
+//배열 안 내용의 요소를 함수를 통해 찾기
+console.log(arr2.find((elm) => {
+  return elm.color === "red";
+}))
+
+//filter
+//배열 필터링 
+newArr = arr2.filter((elm) => {
+  return elm.color === "bule";
+}))
+
+//slice
+arr.slice(0, 2);
+
+//concat
+newArr = arr.concat(arr2);
+
+//sort
+arr.sort((a, b) => b - a);
+
+//join
+//배열 요소들을 다 합쳐서 String으로 리턴
+arr.join(" "); 
+~~~
+
+
+
+## 배열의 비구조화 할당
+
+~~~javascript
+let arr = ["one", "two", "three"];
+
+let a = arr[0];
+let b = arr[1];
+let c = arr[2];
+console.log(a, b, c);
+
+//비구조화
+let [one, two, three] = arr;
+console.log(one, two, three);
+
+//비구조화
+let [one, two, three] = ["one", "two", "three"];
+
+//비어있다면?
+let [one, two, three, four] = ["one", "two", "three"];
+console.log(four) //undefined
+
+//기본값 설정
+let [one, two, three, four = "four"] = ["one", "two", "three"];
+console.log(four) //four
+
+//값 스왑
+let a = 10;
+let b = 20;
+
+//값 스왑하기
+let tmp = 0;
+tmp = a;
+a = b;
+b = tmp;
+
+//비구조화 값 스왑하기
+[a, b] = [b, a];
+
+//객체 배열의 비구조화 할당
+let obj = { one: "1", two: "2", three: "3"};
+
+let one = obj.one;
+let two = obj.two;
+let three = obj.three;
+
+//키로 할당
+let {one, two, three} = obj;
+console.log(one, two, three);
+
+//변수 명을 바꾸고 싶다면
+let { one: myOne, two: myTwo, three } = obj;
+console.log(myOne, myTwo, three);
+~~~
+
+
+
+## 동기 비동기
+
+자바스크립트의 싱글 스레드로 동작 - 동기 방식 처리
+
+* 하나의 작업이 끝나기 전에 다른 작업을 못하도록 막는 것 - 블로킹 방식
+
+싱글 쓰레드 방식이면서 동기적 작업 단점을 극복하기 위해 논 블로킹 방식으로 여러 개의 작업을 동시에 실행시킴
+
+`setTimeout()` 내장 비동기 함수
+
+```javascript
+//콜백 함수
+function taskA(a, b, cb) {
+	setTimeout(() => {
+  	const res = a + b;
+    
+    //콜백
+    cb(res);
+	}, 3000);  
+};
+
+taskA(3, 4, (res) => {
+  console.log("A TASK RESULT ${res}")
+})
+```
+
+### 자바스크립트 엔진
+
+메모리 할당 Heap, 코드 실행 Call Stack 두 개가 존재하는데, 
+
+* 동기적 방식
+  * Call Stack에 우리의 작업이 순서대로 쌓인다. Call Stack 하나가 쓰레드 하나를 담당한다.
+* 비동기적 방식
+  * `setTimeout()` 같은 비동기 함수는 Web APIs에서 작동하고, 콜백 함수가 Callback Queue로 이동한다. 
+  * queue에 담긴 콜백 함수는 Event Loop를 통해 Call Stack으로 이동한다.
+
