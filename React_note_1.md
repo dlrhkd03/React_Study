@@ -1,56 +1,134 @@
 # 리액트
 
+## 단방향 데이터 전달
 
+리액트의 컴포넌트들은 트리 형태로 이어져있다.
 
-## 리액트 특징
+ㅡㅡApp.jsㅡㅡ
+| |
+| |
+Editor.js DataList.js
 
-* 리액트나 뷰 같은 UI 라이브러리의 큰 특징은 화면에 출력되는 유저 인터페이스를 상태로 관히랄 수 있다는 점이다.
+부모 컴포넌트가 기준이 되고 자식 컴포넌트들은 데이터를 사용하거나 수정하기 위해서는 옆에 보이는 자식 컴포넌트에서 바로 보는게 아닌 부모를 이용해서 데이터가 움직이게 된다.
 
----
+```javascript
+  function App() {
+    const [data, setData] = useState([]);
 
-1. 리액티브
+    const onCreate = (a, b, c) => {
+      ...
+    }
 
-   * 기존 자바스크립트를 사용할 때 돔을 통해 애플리케이션을 렌더링한다면
+    return (
+      <>
+        <Editor onCreate={onCreate}/>
+        <DataList dataList={data}/>
+      </>
+    )
+  }
+```
 
-   ~~~javascript
-   let data = "Hello world";
-   document.body.innerHTML = `<p>${data}</p>`;
-   
-   data = "안녕"; //이 곳에서 data 값을 변경해도 위 p태그의 값이 변경되지 않는다.
-   
-   //그래서 우리는 다시 이걸 그린다.
-   document.body.innerHTML = `<p>${data}</p>`;
-   ~~~
+위 처럼 DataList.js에 있는 데이터를 수정하기 위해서는 기존에 있던 state를 부모로 올리고, 데이터를 관리한다.
+Editor의 경우 데이터를 수정하는 함수를 부모 컴포넌트에서 받아서 사용하고,
+DataList의 경우 부모 컴포넌트에서 수정된 데이터를 받아서 사용한다.
 
-   * 위와 같이 데이터 준비, 엘리먼트 생성, 문서에 추가, 엘리먼트 텍스트에 데이터 설정을 하였지만, 데이터를 수정하면 데이터를 다시 엘리먼트에 반영하는 작업이 필요하다.
-   * 상태만 관리함으로써 돔 API를 직접 호출하지 않고 UI까지 제어하도록 개선해보자
+## Lifecycle
 
-   ~~~javascript
-   //VM (View Model)
-   const state = {
-     _data: "Hello world",
-   }
-   
-   const render = () => document.body.innerHTML = `<p>${state.data}</p>`;
-   
-   //객체에 프로퍼티를 생성해주는 메서드
-   Object.defineProperty(state, "data", {
-     //getter와 setter 메서드 자동으로 호출됨
-     get() {
-       return state._data;
-     },
-     set(value) {
-       state._data = value;
-       render();
-     }
-   });
-   
-   render();
-   
-   //아래 프로퍼티를 수정하면 위 set 메서드가 실행되고, render가 실행되면서 get 메서드가 또 실행된다.
-   state.data = "안녕";
-   ~~~
+- 탄생 => 변화 => 죽음
+- 화면에 나타나는 것 => 업데이트 => 화면에서 사라짐
+- Mount => Update => UnMount
+- 초기화 작업 => 예외 처리 작업 => 메모리 정리 작업
 
-   
+리액트에선...
 
-2. 가상돔
+클래스형 컴포넌트의 경우 메서드를 지원함
+
+`ComponentDidMount` => `ComponentDidUpdate` => `ComponentWillUnmount`
+
+함수형 컴포넌트의 경우는 이러한 메서드를 지원하지 않고, 상태 관리 또한 지원하지 않는다.
+
+하지만 우리는 함수형 컴포넌트에서 다른 방식으로 사용하고 있다.
+
+## React Hooks
+
+클래스형 컴포넌트에서는 지원하지만, 함수형 컴포넌트에서 지원하지 않는 메서드들을 낚아채서(Hook) 사용하는 방법이다.
+
+- React Hooks
+  - `useState`
+  - `useEffect`
+  - `useRef`
+
+> 클래스형 컴포넌트의 길어지는 문제, 중복 코드, 가독성 문제 등 해결하기 위해 React Hooks를 지원한다.
+
+```javascript
+import React, { useState, useEffect, useRef } from "react";
+
+const Compo = () => {
+  //useState 사용법
+  const [data, setData] = useState(0); //초기화
+
+  const handleFunc = () => {
+    console.log(data);
+
+    setData(10);
+  };
+
+  //useRef 사용법
+  const contentInput = useRef();
+
+  return <input ref={contentInput} />;
+
+  //useEffect 사용법
+
+  //Mount 화면에 나타남
+  useEffect(() => {}, []);
+
+  //Update 수정됨
+  useEffect(() => {}); //컴포넌트에 대한 Update
+  useEffect(() => {}, [data]); //data 객체에 대한 Update
+
+  //UnMount 화면에서 사라짐
+  //useEffect 내부에서 return시 UnMount 상태임
+  useEffect(() => {
+    return () => {
+      console.log("Unmount");
+    };
+  }, []);
+};
+```
+
+## API 호출
+
+```javascript
+const getDate = async () => {
+  const res = await fetch("https://...").then((res) => {
+    return res.json();
+  });
+};
+```
+
+## 메모리 낭비 최적화
+
+API로 가져오는 데이터들이 계속 변할 때 어느 컴포넌트가 렌더링이 되는 경우 어떤 조건에서는 렌더링이 될 필요가 없을 때가 있다.
+
+어떠한 데이터가 변할 때만 데이터가 변하도록 설정하는 `useMemo`
+
+```javascript
+  //useMemo 메모제이션 이용해서 연산 최적화(반복 연산 못하도록)
+  const getData = useMemo(() => {
+    ...
+    return { data.a ,data.b, data.c};
+  }, [data.length]); //무엇이 변할 때 이 연산을 할지 설정하는 함수라 생각하면 된다.
+
+  const { a, b, c } = getData;
+```
+
+부모 컴포넌트가 렌더링되면, 자식 컴포넌트는 모두 렌더링이 된다.
+
+자식 컴포넌트1이 렌더링 될 때, 부모 컴포넌트가 렌더링 되지만 1과 관련없는 자식 컴포넌트2가 렌더링 된다면 메모리 낭비가 된다.
+
+함수형 컴포넌트에게 업데이트(렌더링)되는 조건 `memo`
+
+```javascript
+
+```

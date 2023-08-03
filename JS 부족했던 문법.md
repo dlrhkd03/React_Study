@@ -15,9 +15,28 @@ const 객체 = {
 
 2. 객체['속성이름'];
    
-* 특수문자나 숫자가 들어가있는 경우 대괄호로 접근, 아니면 기본방식으로 접근
+* 특수문자나 숫자가 들어가있는 경우, 변수의 값이나 문자열을 프로퍼티의 키로 사용하는 경우 대괄호로 접근, 아니면 기본방식으로 접근
 * 없는 속성에 접근시 undefined
 * delete로 객체 내부를 삭제할 수 있다.
+
+```javascript
+//어느 오브젝트의 name에 저장된 값을 프로퍼티의 키로
+const [state, setState] = useState({
+    author: "",
+    content: "",
+})
+
+...
+
+const handleChnage = (e) => {
+    setState({
+        ...state,
+        //e.target.name: e.target.value 이게 아닌
+        [e.target.name]: e.target.value
+    })
+    
+}
+```
 
 ## 함수와 배열은 객체이다.
 
