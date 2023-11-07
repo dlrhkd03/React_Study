@@ -37,7 +37,7 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.0.3",
     "webpack-bundle-analyzer": "^4.4.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -70,6 +70,6 @@
     "fork-ts-checker-webpack-plugin": "^8.0.0",
     "prettier": "^2.2.1",
     "webpack": "^5.22.0",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.10.1"
   }
 }
